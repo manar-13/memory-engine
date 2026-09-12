@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Memory Engine</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f1117;
+            color: #e6e6e6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 20px 80px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: #9aa0ac;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .card {
+            background: #171a23;
+            border: 1px solid #262b38;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            margin: 0 0 4px;
+            font-size: 18px;
+        }
+
+        .card p.desc {
+            color: #9aa0ac;
+            margin: 0 0 14px;
+            font-size: 14px;
+        }
+
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        button {
+            background: #1f2430;
+            color: #e6e6e6;
+            border: 1px solid #333a4a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2a3040;
+        }
+
+        button.primary {
+            background: #4c5eff;
+            border-color: #4c5eff;
+        }
+
+        button.primary:hover {
+            background: #3d4de0;
+        }
+
+        button.danger {
+            background: #3a1f24;
+            border-color: #6b2e37;
+        }
+
+        button.danger:hover {
+            background: #4a262c;
+        }
+
+        #result {
+            background: #12141c;
+            border: 1px solid #262b38;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 8px;
+            min-height: 60px;
+        }
+
+        .fact {
+            border-left: 3px solid #4c5eff;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            background: #171a23;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .fact.warn {
+            border-left-color: #e0a030;
+        }
+
+        .fact-content {
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .fact-meta {
+            font-size: 12px;
+            color: #9aa0ac;
+        }
+
+        .bar-bg {
+            background: #262b38;
+            border-radius: 4px;
+            height: 6px;
+            margin: 6px 0;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: #4c5eff;
+        }
+
+        .warning-box {
+            background: #2a1f10;
+            border: 1px solid #6b4e1e;
+            color: #e0a030;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+
+        .status-active {
+            background: #16321f;
+            color: #4ade80;
+        }
+
+        .status-contradicted {
+            background: #3a1f24;
+            color: #f87171;
+        }
+
+        .status-revoked {
+            background: #2b2b2b;
+            color: #999;
+        }
+
+        .empty {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        h3.section {
+            margin-top: 40px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🧠 Memory Engine</h1>
+    <p class="subtitle">A memory layer that tags every fact with a source, a confidence level, and freshness — and
+        admits when it might be wrong. Click a scenario below.</p>
+
+    <div class="card">
+        <h2>👤 User Preferences</h2>
+        <p class="desc">A personal assistant remembering things about you.</p>
+        <div class="btn-row">
+            <button onclick="rememberPreference()">Remember: prefers dark mode</button>
+            <button onclick="contradictPreference()">Show a contradiction (moved cities)</button>
+            <button class="danger" onclick="forgetPreference()">Forget my phone number</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🎫 Support History</h2>
+        <p class="desc">Customer support remembering a customer's past issues.</p>
+        <div class="btn-row">
+            <button onclick="logSupport(0.9)">Log: confirmed billing issue</button>
+            <button onclick="logSupport(0.3)">Log: vague, unclear complaint</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📋 Project Knowledge</h2>
+        <p class="desc">A team's shared memory about a project — the kind of fact that quietly goes stale.</p>
+        <div class="btn-row">
+            <button onclick="addProjectFact(false)">Add: fresh fact (just now)</button>
+            <button onclick="addProjectFact(true)">Add: old fact (120 days old)</button>
+        </div>
+    </div>
+
+    <div id="result">
+        <p class="empty">Click a scenario above to see the memory engine respond here.</p>
+    </div>
+
+    <h3 class="section">🔍 Memory Inspector — "What do you remember about me?"</h3>
+    <p class="desc">Shows everything for a scope, including contradicted and revoked memories, for full transparency.
+    </p>
+    <div class="btn-row">
+        <button onclick="inspect('user:demo-user')">Inspect user:demo-user</button>
+        <button onclick="inspect('customer:demo-customer')">Inspect customer:demo-customer</button>
+        <button onclick="inspect('project:demo-project')">Inspect project:demo-project</button>
+    </div>
+    <div id="inspector" style="margin-top:14px;"></div>
+
+    <script>
+        let lastPreferenceId = null;
+        let lastPhoneId = null;
+
+        async function post(url, body) {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            return res.json();
+        }
+        async function get(url) {
+            const res = await fetch(url);
+            return res.json();
+        }
+
+        function renderRetrieved(list, emptyMsg) {
+            const el = document.getElementById("result");
+            if (!list.length) {
+                el.innerHTML = `<p class="empty">${emptyMsg}</p>`;
+                return;
+            }
+            el.innerHTML = list.map(r => `
+        <div class="fact ${r.warning ? "warn" : ""}">
+            <div class="fact-content">${r.fact.content}</div>
+            <div class="fact-meta">Source: ${r.fact.source} · Scope: ${r.fact.scope}</div>
+            <div class="bar-bg"><div class="bar-fill" style="width:${r.effectiveConfidence * 100}%"></div></div>
+            <div class="fact-meta">Confidence: ${(r.effectiveConfidence * 100).toFixed(0)}%</div>
+            ${r.warning ? `<div class="warning-box">⚠️ ${r.warning}</div>` : ""}
+        </div>
+    `).join("");
+        }
+
+        async function rememberPreference() {
+            const fact = await post("/api/preferences", {
+                userId: "demo-user", content: "prefers dark mode", source: "settings page", confidence: 0.95
+            });
+            lastPreferenceId = fact.id;
+            const list = await get("/api/preferences/demo-user");
+            renderRetrieved(list, "No preferences yet.");
+        }
+
+        async function contradictPreference() {
+            const old = await post("/api/preferences", {
+                userId: "demo-user", content: "lives in Manama", source: "chat, June 2026", confidence: 0.8
+            });
+            await post("/api/preferences", {
+                userId: "demo-user", content: "lives in Riffa", source: "chat, September 2026", confidence: 0.9,
+                contradictsFactId: old.id
+            });
+            const list = await get("/api/preferences/demo-user");
+            renderRetrieved(list, "No preferences yet.");
+        }
+
+        async function forgetPreference() {
+            const fact = await post("/api/preferences", {
+                userId: "demo-user", content: "phone number: 3300-XXXX", source: "form", confidence: 1
+            });
+            await post("/api/forget", { id: fact.id, reason: "user requested deletion" });
+            const list = await get("/api/preferences/demo-user");
+            renderRetrieved(list, "This memory was forgotten. It no longer appears here — check the inspector to see it marked as revoked.");
+        }
+
+        async function logSupport(confidence) {
+            const content = confidence >= 0.9 ? "confirmed billing issue on invoice #4821" : "customer described a vague, unclear problem";
+            await post("/api/support", {
+                customerId: "demo-customer", content, source: "support ticket", confidence
+            });
+            const list = await get("/api/support/demo-customer");
+            renderRetrieved(list, "No support history yet.");
+        }
+
+        async function addProjectFact(old) {
+            await post("/api/project", {
+                projectId: "demo-project",
+                content: old ? "staging API runs on port 4000" : "staging API runs on port 5000",
+                source: old ? "README, written 120 days ago" : "README, just updated",
+                confidence: 0.9,
+                backdateDays: old ? 120 : 0
+            });
+            const list = await get("/api/project/demo-project");
+            renderRetrieved(list, "No project knowledge yet.");
+        }
+
+        async function inspect(scope) {
+            const all = await get("/api/inspect/" + encodeURIComponent(scope));
+            const el = document.getElementById("inspector");
+            if (!all.length) {
+                el.innerHTML = `<p class="empty">Nothing remembered yet for ${scope}.</p>`;
+                return;
+            }
+            el.innerHTML = all.map(f => `
+        <div class="fact">
+            <div class="fact-content">${f.content}
+                <span class="status-badge status-${f.status}">${f.status}</span>
+            </div>
+            <div class="fact-meta">Source: ${f.source} · Confidence: ${(f.confidence * 100).toFixed(0)}%</div>
+            ${f.revokedReason ? `<div class="fact-meta">Revoked reason: ${f.revokedReason}</div>` : ""}
+        </div>
+    `).join("");
+        }
+    </script>
+</body>
+
+</html>
