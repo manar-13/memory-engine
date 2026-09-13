@@ -1,0 +1,9 @@
+# Where agent memory goes next (a two-year thesis)
+
+Most memory systems today are graded on recall: can the agent bring back a fact it was told before? That's the wrong benchmark. My own failure test exposed the real problem: an agent can hold two directly contradicting beliefs about the same thing at the same time, both stamped "active," both delivered with equal confidence, because nothing ever compared them to each other. Recall isn't the hard part. Noticing you've contradicted yourself is.
+
+So my bet is this: within two years, "good memory" will stop meaning "remembers a lot" and start meaning "actively reconciles what it remembers." The systems that win won't be the ones with the biggest vector store — they'll be the ones that catch, in real time, when a new fact conflicts with an old one about the same person or the same topic, and force a decision about which one survives, instead of silently keeping both.
+
+The second shift: forgetting stops being a delete button and becomes a policy with a paper trail. Right now, most systems either remember forever or wipe everything, with nothing in between. My own engine already treats forgetting as a first-class action with a recorded reason — but the next step is systems that can explain, to the person being remembered, exactly why something was kept, why something was dropped, and how confident they still are in what's left. "What do you remember about me, and how sure are you" will move from a nice feature to something regulators and users both expect to be answerable on demand.
+
+The common thread across both shifts: the hard part was never storing the fact. It's noticing when the facts stop agreeing with each other, and being honest about it when they do.
